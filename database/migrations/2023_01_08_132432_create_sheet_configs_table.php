@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('sheet_config', function (Blueprint $table) {
+        Schema::create('sheet_configs', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('sheet_id');
             $table->bigInteger('medication_id');
@@ -34,6 +34,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('sheet_config');
+        Schema::dropIfExists('sheet_configs');
     }
 };

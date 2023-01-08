@@ -36,6 +36,7 @@ Route::get('/labels', function () {
 
 Route::prefix('labels')->group(function () {
     Route::get('generate', [LabelController::class, 'generate'])->name('labels.generate');
+    Route::post('import-config', [LabelController::class, 'importLabelConfig'])->name('labels.generate');
 });
 
 Route::middleware('auth')->group(function () {

@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\SheetsImport;
+use App\Models\SheetConfig;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Elibyy\TCPDF\Facades\TCPDF;
 
 class LabelController extends Controller
@@ -70,5 +73,20 @@ class LabelController extends Controller
     public function preview(Request $request)
     {
 
+    }
+
+    public function importLabelConfig(Request $request)
+    {
+        $sheets = [];
+        $medications = [];
+        $units = [];
+
+        SheetConfig::unguard();
+
+        SheetConfig::truncate();
+
+        Excel::import(new SheetsImport($sheets, $medications, $units), $request->file);
+
+        SheetConfig::reguard();
     }
 }
