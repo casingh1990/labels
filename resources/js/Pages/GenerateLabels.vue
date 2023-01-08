@@ -1,6 +1,8 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/inertia-vue3';
+import axios from 'axios';
+import NoWorkResult from 'postcss/lib/no-work-result';
 </script>
 
 <template>
@@ -27,7 +29,7 @@ import { Head } from '@inertiajs/inertia-vue3';
                                     </label>
                                 </div>
                                 <div>
-                                    <input type="text" name="lastname">
+                                    <input type="text" name="lastname" v-model="form.lastName">
                                 </div>
 
                                 <div class="form-row">
@@ -36,7 +38,10 @@ import { Head } from '@inertiajs/inertia-vue3';
                                     </label>
                                 </div>
                                 <div>
-                                    <input type="text" name="dateprepared" value="01/08/2023">
+                                    <Datepicker
+                                        v-model="form.datePrepared"
+                                        input-format="MM/dd/yyy"
+                                    ></Datepicker>
                                 </div>
 
                                 <div class="form-row">
@@ -45,7 +50,10 @@ import { Head } from '@inertiajs/inertia-vue3';
                                     </label>
                                 </div>
                                 <div>
-                                    <input type="text" name="expdate" value="01/08/2023">
+                                    <Datepicker
+                                        v-model="form.expDate"
+                                        input-format="MM/dd/yyy"
+                                    ></Datepicker>
                                 </div>
 
                                 <div class="form-row">
@@ -54,7 +62,7 @@ import { Head } from '@inertiajs/inertia-vue3';
                                     </label>
                                 </div>
                                 <div>
-                                    <input type="text" name="exptime" value="1900">
+                                    <vue-timepicker v-model="form.expTime"></vue-timepicker>
                                 </div>
 
                                 <div class="form-row">
@@ -63,7 +71,10 @@ import { Head } from '@inertiajs/inertia-vue3';
                                     </label>
                                 </div>
                                 <div>
-                                    <select name="sheet">
+                                    <select
+                                        name="sheet"
+                                        v-model="form.sheet"
+                                    >
                                         <option>GENERAL</option>
                                         <option>CARDIAC</option>
                                         <option>T&A</option>
@@ -75,7 +86,13 @@ import { Head } from '@inertiajs/inertia-vue3';
 
                                 <div class="col-span-2">
                                     <div class="flex flex-col items-center">
-                                        <button class="self-center" type="submit">GENERATE LABELS</button>
+                                        <button
+                                            class="self-center"
+                                            @click="generateLabel"
+                                            type="button"
+                                        >
+                                            GENERATE LABELS
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -97,3 +114,32 @@ import { Head } from '@inertiajs/inertia-vue3';
         </div>
     </AuthenticatedLayout>
 </template>
+
+<script>
+import Datepicker from 'vue3-datepicker';
+import VueTimepicker from 'vue3-timepicker';
+import 'vue3-timepicker/dist/VueTimepicker.css';
+import { format } from 'date-fns';
+
+export default {
+    components: { Datepicker, VueTimepicker },
+    data() {
+        return {
+            form: {
+                datePrepared: new Date(),
+                expDate: new Date(),
+                expTime: format(new Date(), 'hh:mm'),
+                sheet: 'GENERAL',
+                lastName: '',
+            },
+            count: 0
+        }
+    },
+    methods: {
+        generateLabel() {
+            console.log('generateLabel was called');
+            axios.get(`/api/label?sheet=${this.sheet}`)
+        }
+    }
+}
+</script>
