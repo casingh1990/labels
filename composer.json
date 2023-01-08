@@ -6,11 +6,14 @@
     "license": "MIT",
     "require": {
         "php": "^8.0.2",
+        "dompdf/dompdf": "^2.0",
+        "elibyy/tcpdf-laravel": "^9.3",
         "guzzlehttp/guzzle": "^7.2",
         "inertiajs/inertia-laravel": "^0.6.3",
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^2.8",
         "laravel/tinker": "^2.7",
+        "maatwebsite/excel": "^3.1",
         "tightenco/ziggy": "^1.0"
     },
     "require-dev": {

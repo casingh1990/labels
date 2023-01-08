@@ -137,7 +137,7 @@ export default {
     methods: {
         generateLabel() {
             console.log('generateLabel was called');
-            axios.get(`/labels/generate?sheet=${this.sheet}`, {
+            axios.get(`/labels/generate?sheet=${this.form.sheet}`, {
                 responseType: 'blob'
             }).then(( response ) => {
                 window.open(URL.createObjectURL(response.data));
