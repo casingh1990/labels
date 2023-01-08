@@ -20,12 +20,6 @@ class SheetService
         $pdf::SetTitle($inputs['sheet']);
         $pdf::AddPage('', 'LETTER');
 
-        // set cell padding
-        $pdf::setCellPaddings(1, 1, 1, 1);
-
-        // set cell margins
-        $pdf::setCellMargins(1, 1, 1, 1);
-
         // set color for background
         $pdf::setFillColor(255, 255, 127);
 
@@ -48,6 +42,31 @@ class SheetService
         foreach ($sheetConfigs as $sheetConfig) {
             $sheetConfigByCoordinates[$sheetConfig->row][$sheetConfig->column] = $sheetConfig;
         }
+
+        $pdf::setCellMargins(-4,0,0,0);
+        $pdf::setCellPaddings(0,0,0,0);
+
+        $pdf::MultiCell(
+            0,
+            5,
+            $this->inputs['sheet']
+            . ' - PRINTED BY: '
+            . $this->inputs['name']
+            . ' - Expires '
+            . Carbon::parse($this->inputs['exp_date'] . $this->inputs['exp_time'])->format('l, F j, Y h:i A'),
+            0,
+            'C',
+            0,
+            1,
+            null,
+            5
+        );
+
+         // set cell padding
+        $pdf::setCellPaddings(1, 1, 1, 1);
+
+        // set cell margins
+        $pdf::setCellMargins(1, 1, 1, 1);
 
         for ($i = 0; $i < $count; $i++) {
             // Multicell test
@@ -78,15 +97,6 @@ class SheetService
         $this->writePrepAndExpDates($pdf, $sheetConfigByCoordinates[$rowNum][3]);
         $this->writePrepAndExpDates($pdf, $sheetConfigByCoordinates[$rowNum][4]);
         $pdf::setCellMargins(0, 1, 1, 1);
-
-        $pdf::Ln();
-
-        $this->writeInitialAndExpTime($pdf, $sheetConfigByCoordinates[$rowNum][1]);
-        $pdf::setCellMargins(6.5, 1, 1, 1);
-        $this->writeInitialAndExpTime($pdf, $sheetConfigByCoordinates[$rowNum][2]);
-        $this->writeInitialAndExpTime($pdf, $sheetConfigByCoordinates[$rowNum][3]);
-        $this->writeInitialAndExpTime($pdf, $sheetConfigByCoordinates[$rowNum][4]);
-        $pdf::setCellMargins(0, 1, 1, 1);
     }
 
     protected function writeLabel($pdf, $labelConfig)
@@ -102,20 +112,17 @@ class SheetService
     protected function writePrepAndExpDates($pdf, $labelConfig)
     {
         $pdf::setFontSize(6.5);
-        $prepAndExpDatesString = 'Prep Date '
-            . '<u>' . Carbon::parse($this->inputs['prep_date'])->format('m/d/y') . '</u>'
-            . ' &nbsp;&nbsp;&nbsp; Exp Date '
-            . '<u>' . Carbon::parse($this->inputs['exp_date'])->format('m/d/y') . '</u>';
-        $pdf::writeHTMLCell($this->width, 1, $pdf::getX(), $pdf::getY(), $prepAndExpDatesString, 'LR', 0, true, true, 'C', '', true);
-    }
+        $prepAndExpDatesString = '<table>'
+            . '<tr><td>Prep Date'
+            . '<u>' . Carbon::parse($this->inputs['prep_date'])->format('m/d/y') . '</u></td>'
+            . '<td>Exp Date '
+            . '<u>' . Carbon::parse($this->inputs['exp_date'])->format('m/d/y') . '</u></td></tr>'
+            . '<tr><td>' . (strlen($this->inputs['name']) > 5 ? '' : 'Initial ')
+            . '<u>' . $this->inputs['name'] . '</u></td>'
+            . '<td>Exp Time '
+            . '<u>' . $this->inputs['exp_time'] . '</u></td></tr></table>';
 
-    protected function writeInitialAndExpTime($pdf, $labelConfig)
-    {
-        $pdf::setFontSize(6.5);
-        $initialAndExpTimeString = (strlen($this->inputs['name']) > 5 ? '' : 'Initial ')
-            . '<u>' . $this->inputs['name'] . '</u>'
-            . ' &nbsp;&nbsp;&nbsp; Exp Time '
-            . '<u>' . Carbon::parse($this->inputs['exp_time'])->format('m/d/y') . '</u>';
-        $pdf::writeHTMLCell($this->width, 3.75, $pdf::getX(), $pdf::getY(), $initialAndExpTimeString, 'LRB', 0, true, true, 'C', '', true);
+        //echo $prepAndExpDatesString;exit();
+        $pdf::writeHTMLCell($this->width, 6.845, $pdf::getX(), $pdf::getY(), $prepAndExpDatesString, 'LRB', 0, true, true, 'C', '', true);
     }
 }
