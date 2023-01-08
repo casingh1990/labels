@@ -2,12 +2,11 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/inertia-vue3';
 import axios from 'axios';
-import NoWorkResult from 'postcss/lib/no-work-result';
 </script>
 
 <template>
 
-    <Head title="Dashboard" />
+    <Head title="Generate Labels" />
 
     <AuthenticatedLayout>
         <template #header>
@@ -38,10 +37,7 @@ import NoWorkResult from 'postcss/lib/no-work-result';
                                     </label>
                                 </div>
                                 <div>
-                                    <Datepicker
-                                        v-model="form.datePrepared"
-                                        input-format="MM/dd/yyy"
-                                    ></Datepicker>
+                                    <Datepicker v-model="form.datePrepared" input-format="MM/dd/yyy"></Datepicker>
                                 </div>
 
                                 <div class="form-row">
@@ -50,10 +46,7 @@ import NoWorkResult from 'postcss/lib/no-work-result';
                                     </label>
                                 </div>
                                 <div>
-                                    <Datepicker
-                                        v-model="form.expDate"
-                                        input-format="MM/dd/yyy"
-                                    ></Datepicker>
+                                    <Datepicker v-model="form.expDate" input-format="MM/dd/yyy"></Datepicker>
                                 </div>
 
                                 <div class="form-row">
@@ -71,10 +64,7 @@ import NoWorkResult from 'postcss/lib/no-work-result';
                                     </label>
                                 </div>
                                 <div>
-                                    <select
-                                        name="sheet"
-                                        v-model="form.sheet"
-                                    >
+                                    <select name="sheet" v-model="form.sheet">
                                         <option>GENERAL</option>
                                         <option>CARDIAC</option>
                                         <option>T&A</option>
@@ -86,11 +76,7 @@ import NoWorkResult from 'postcss/lib/no-work-result';
 
                                 <div class="col-span-2">
                                     <div class="flex flex-col items-center">
-                                        <button
-                                            class="self-center"
-                                            @click="generateLabel"
-                                            type="button"
-                                        >
+                                        <button class="self-center" @click="generateLabel" type="button">
                                             GENERATE LABELS
                                         </button>
                                     </div>
@@ -107,6 +93,11 @@ import NoWorkResult from 'postcss/lib/no-work-result';
                                     applicable law, no responsibility is assumed by the creator of this tool for any
                                     injury and/or damage caused by its use. </div>
                             </div>
+                        </form>
+                        <form>
+                            Upload a new config here
+                            <input type="file" @change="uploadFile" ref="file" />
+                            <button @click="submitFile()" type="button">Upload!</button>
                         </form>
                     </div>
                 </div>
@@ -132,14 +123,40 @@ export default {
                 sheet: 'GENERAL',
                 lastName: '',
             },
+            files: null,
             count: 0
         }
     },
     methods: {
         generateLabel() {
             console.log('generateLabel was called');
-            axios.get(`/api/label?sheet=${this.sheet}`)
-        }
+            axios.get(`/labels/generate?sheet=${this.form.sheet}&prep_date=${format(this.form.datePrepared, 'M/d/yyyy')}&exp_date=${format(this.form.expDate, 'M/d/yyyy')}&exp_time=${this.form.expTime}&name=${this.form.lastName}`, {
+                responseType: 'blob'
+            }).then((response) => {
+                window.open(URL.createObjectURL(response.data));
+            });
+        },
+        submitFile() {
+            let formData = new FormData();
+            formData.append('file', this.file);
+            console.log('>> formData >> ', formData);
+
+            axios.post('http://localhost/labels/import-config',
+                formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            }
+            ).then(function () {
+                console.log('SUCCESS!!');
+            })
+                .catch(function () {
+                    console.log('FAILURE!!');
+                });
+        },
+        uploadFile() {
+            this.file = this.$refs.file.files[0];
+        },
     }
 }
 </script>
