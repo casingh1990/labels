@@ -2,12 +2,11 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/inertia-vue3';
 import axios from 'axios';
-import NoWorkResult from 'postcss/lib/no-work-result';
 </script>
 
 <template>
 
-    <Head title="Dashboard" />
+    <Head title="Generate Labels" />
 
     <AuthenticatedLayout>
         <template #header>
@@ -138,7 +137,11 @@ export default {
     methods: {
         generateLabel() {
             console.log('generateLabel was called');
-            axios.get(`/api/label?sheet=${this.sheet}`)
+            axios.get(`/labels/generate?sheet=${this.sheet}`, {
+                responseType: 'blob'
+            }).then(( response ) => {
+                window.open(URL.createObjectURL(response.data));
+            });
         }
     }
 }
