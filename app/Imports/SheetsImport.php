@@ -5,7 +5,7 @@ namespace App\Imports;
 use App\Models\Medication;
 use App\Models\Sheet;
 use App\Models\SheetConfig;
-
+use App\Models\Unit;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\RemembersRowNumber;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -78,7 +78,7 @@ class SheetsImport implements ToModel, WithHeadingRow
     protected function getUnit($name)
     {
         if (!isset($this->units[$name])) {
-            $this->units[$name] = Medication::firstOrCreate(
+            $this->units[$name] = Unit::firstOrCreate(
                 ['name' => $name]
             );
         }
